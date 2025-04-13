@@ -1,56 +1,87 @@
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
-const lightbox = new SimpleLightbox('.gallery a', {
-  captions: true,
+let lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
 
-const gallery = document.querySelector('.gallery');
-const loader = document.querySelector('.loader');
+export function showLoader() {
+    const loader = document.querySelector('.loader');
+    if (loader) {
+        loader.style.display = 'inline-block'; 
+    }
+}
+
+export function hideLoader() {
+    const loader = document.querySelector('.loader');
+    if (loader) {
+        loader.style.display = 'none'; 
+    }
+};
+
+export const clearGallery = () => {
+  const gallery = document.querySelector('.gallery');
+  gallery.innerHTML = '';  
+  smoothScroll(); 
+};
 
 export function createGallery(images) {
-  return images .map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => `
+  const gallery = document.querySelector('.gallery');
+
+  gallery.insertAdjacentHTML('beforeend', images
+    .map(
+      ({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => `
       <li class="gallery-item">
         <a class="gallery-link" href="${largeImageURL}">
           <img class="gallery-image" src="${webformatURL}" alt="${tags}" loading="lazy" />
         </a>
-        <div class="thumb-block">
-          <div class="block"><h2 class="tittle">Likes</h2><p class="amount">${likes}</p></div>
-          <div class="block"><h2 class="tittle">Views</h2><p class="amount">${views}</p></div>
-          <div class="block"><h2 class="tittle">Comments</h2><p class="amount">${comments}</p></div>
-          <div class="block"><h2 class="tittle">Downloads</h2><p class="amount">${downloads}</p></div>
-        </div>
+        <div class="info">
+                <p><b>Likes</b><br>${likes}</p>
+                <p><b>Views</b><br>${views}</p>
+                <p><b>Comments</b><br>${comments}</p>
+                <p><b>Downloads</b><br>${downloads}</p>
+            </div>
       </li>`
-    )
-    .join('');
-}
+    ).join(''));
 
-export function changegallery(images) {
-  clearGallery();
-  gallery.innerHTML = createGallery(images);
   lightbox.refresh();
 }
 
-export function clearGallery() {
-  gallery.innerHTML = '';
+export function initializeLightbox() {
+  if (!lightbox) {
+    lightbox = new SimpleLightbox('.gallery a', {
+      captionsData: 'alt',
+      captionDelay: 250,
+    });
+  }
+  lightbox.refresh(); 
 }
 
-export function showLoader() {
-  loader.style.display = 'block';
+export function smoothScroll() {
+    const firstCard = document.querySelector('.gallery-item');
+
+    if (firstCard) {
+        const cardHeight = firstCard.getBoundingClientRect().height;
+
+        window.scrollBy({
+            top: cardHeight * 2,
+            left: 0,
+            behavior: "smooth",
+        });
+    }
 }
 
-export function hideLoader() {
-  loader.style.display = 'none';
+export function showLoadMoreButton() {
+    const loadMore = document.querySelector('.load-more');
+    if (loadMore) {
+        loadMore.style.display = 'flex'; 
+    }
 }
 
-export function errorResult(message) {
-  iziToast.error({
-    title: 'Error',
-    message: message,
-    position: 'topRight',
-  });
-}
+export function hideLoadMoreButton() {
+    const loadMore = document.querySelector('.load-more');
+    if (loadMore) {
+        loadMore.style.display = 'none'; 
+    }
+};
